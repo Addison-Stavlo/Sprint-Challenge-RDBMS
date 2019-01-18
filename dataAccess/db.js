@@ -11,10 +11,21 @@ function addAction(newAction) {
     return db('actions').insert(newAction);
 }
 
-async function getProject(projectID) {
-    let project = await db('projects').where({id: projectID});
+function getProjects() {
+    return db('projects');
+}
 
-    let actions = await db('actions').join('projects','projects.id','=','actions.project_id').where({id: projectID});
+async function getProject(projectID) {
+    let project = await db('projects').select('id','name','description','complete').where({id: projectID});
+
+    if(project[0].complete === 0){
+        project[0].complete = false
+    }
+    else{
+        project[0].complete = true
+    }
+
+    let actions = await db('actions').join('projects','projects.id','=','actions.project_id').select('actions.id','actions.task','actions.notes').where({'projects.id': projectID});
 
     return {
         ...project[0],
@@ -23,5 +34,8 @@ async function getProject(projectID) {
 }
 //exports
 module.exports = {
-    addProject
+    addProject,
+    addAction,
+    getProjects,
+    getProject
 }
