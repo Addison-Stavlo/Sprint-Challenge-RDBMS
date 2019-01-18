@@ -29,5 +29,25 @@ server.get('/api/projects/:id', async (req,res) => {
         res.status(500).json(err);
     }
 })
+
+server.post('/api/projects', async (req, res) => {
+    try{
+        let ids = await db.addProject(req.body);
+        res.status(201).json(ids)
+    }
+    catch(err){
+        res.status(500).json(err);
+    }
+});
+
+server.post('/api/projects/:id', async (req,res) => {
+    try{
+        let ids = await db.addAction(req.body,req.params.id);
+        res.status(201).json(ids)
+    }
+    catch(err){
+        res.status(500).json(err);
+    }
+})
 //exports
 module.exports = server;

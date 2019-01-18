@@ -7,7 +7,8 @@ function addProject(newProject) {
     return db('projects').insert(newProject);
 }
 
-function addAction(newAction) {
+function addAction(newAction, projectID) {
+    newAction.project_id = projectID;
     return db('actions').insert(newAction);
 }
 
@@ -25,7 +26,16 @@ async function getProject(projectID) {
         project[0].complete = true
     }
 
-    let actions = await db('actions').join('projects','projects.id','=','actions.project_id').select('actions.id','actions.task','actions.notes').where({'projects.id': projectID});
+    let actions = await db('actions').join('projects','projects.id','=','actions.project_id').select('actions.id','actions.task','actions.notes','actions.complete').where({'projects.id': projectID});
+
+    actions.forEach(action => {
+        if(action.complete === 0){
+            action.complete = false
+        }
+        else{
+            action.complete = true
+        }
+    })
 
     return {
         ...project[0],
